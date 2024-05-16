@@ -53,7 +53,8 @@ class Mode1Navigator:
                     temp -= island.item.get_guardians()
                 else:
                     island_list.append((island.item, temp))
-                    return island_list
+                    break
+        return island_list
             
     def select_sites_from_adventure_numbers(self, adventure_numbers: list[int]) -> list[float]:
         """
@@ -86,4 +87,7 @@ if __name__ == "__main__":
         Land(f.get_name(), f.get_gold(), f.get_guardians())
     ]
     
-    nav = Mode1Navigator(sites, 200)
+    #nav = Mode1Navigator(sites, 200)
+    nav = Mode1Navigator(sites, 0)
+    selected = nav.select_sites()
+    print(selected)
