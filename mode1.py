@@ -17,7 +17,6 @@ class Mode1Navigator:
         binary_tree = BinarySearchTree()
         self.split(gold_adventureres_ratio, binary_tree)
         self.sites = binary_tree
-        self.sites.draw()
         self.adventurers = adventurers
         
     def split(self,lst,binary_tree):
@@ -36,7 +35,6 @@ class Mode1Navigator:
             self.auxilary_split(lst[:middle_index], binary_tree)
             self.auxilary_split(lst[middle_index+1:], binary_tree)
             
-        
     def select_sites(self) -> list[tuple[Land, int]]:
         """
         Student-TODO: Best/Worst Case
