@@ -85,7 +85,7 @@ class Mode1Navigator:
         
         del (self.sites[-(land.get_gold()/land.get_guardians())])
         land.set_gold(new_reward)
-        land.set_guardians(new_guardians)
+        land.set_guardians(new_guardians)   
         self.sites[-(land.get_gold()/land.get_guardians())] = land
     
 if __name__ == "__main__":

@@ -24,23 +24,23 @@ class Mode2Navigator:
         for index in range(len(sites)):
             self.sites[sites[index].get_name()] = sites[index]
             
-        self.name_lst = self.sites.keys()
         self.value_lst = self.sites.values()
           
     def simulate_day(self, adventurer_size: int) -> list[tuple[Land | None, int]]:
         """
         Student-TODO: Best/Worst Case
         """
-        self.construct_score_data_structure(adventurer_size) #O(K)
+        self.construct_score_data_structure(adventurer_size) 
         lst = []
-        for _ in range(self.teams):
-            island_score = self.heap.get_max()
-            data = self.compute_score(island_score, adventurer_size)   
+        for _ in range(self.teams): #O(K)
+            island_score = self.heap.get_max() #O(logn)
+            data = self.compute_score(island_score, adventurer_size)   #O(1)
             if data[0] == 0:
-                lst.append(None, data[1])
+                lst.append((None, data[1]))
             else:
                 lst.append((self.sites[island_score[1]], data[1]))
         return lst
+    
     def compute_score(self, max_land, original_adventurer: int): #(x,y)
         """_summary_
 
@@ -49,21 +49,29 @@ class Mode2Navigator:
             land (Land): _description_
         """
         land = self.sites[max_land[1]]
-        remaining_adventurer = original_adventurer - land.get_guardians()
-        if remaining_adventurer >= 0:
-            adventurer_sent = land.get_guardians()
-            gold_stolen = min((adventurer_sent*land.get_gold())/land.get_guardians(), land.get_gold())
-            score = (2.5 * (remaining_adventurer)) + gold_stolen
-        else:
-            adventurer_sent = original_adventurer
-            score = (2.5 * (0)) + min((adventurer_sent*land.get_gold())/land.get_guardians(), land.get_gold()) 
-            if score < (2.5 * original_adventurer):
-                score = 2.5 * original_adventurer
+        if original_adventurer >= land.get_guardians():
+            remaining_score = (2.5 * original_adventurer)
+            if land.get_gold() == 0:
+                gold_stolen = 0
+                adventurer_sent = 0
             else:
-                gold_stolen = min((adventurer_sent*land.get_gold())/land.get_guardians(), land.get_gold())
-                remaining_adventurer = 0
-        self.heap.add((score, max_land[1]))
-        return (gold_stolen, remaining_adventurer)
+                gold_stolen = land.get_gold()
+                adventurer_sent =  land.get_guardians()
+                land.set_gold(0)
+                land.set_guardians(0)
+        else: 
+            gold_stolen = min((original_adventurer * land.get_gold()) / land.get_guardians(), land.get_gold())
+            if (2.5 * original_adventurer) > gold_stolen:
+                #remaining_score = (2.5 * original_adventurer)
+                remaining_score = land[0]
+                adventurer_sent = 0
+            else: 
+                remaining_score = land.get_gold() - gold_stolen #careful of this
+                land.set_guardians(land.get_guardians() - original_adventurer)
+                land.set_gold(land.get_gold() - gold_stolen)
+                adventurer_sent = original_adventurer
+        self.heap.add((remaining_score, max_land[1]))
+        return (gold_stolen, adventurer_sent)
     
     def construct_score_data_structure(self, adventurer_number):
         """_summary_
@@ -75,12 +83,12 @@ class Mode2Navigator:
         for land in self.value_lst:
             difference = adventurer_number - land.get_guardians()
             if difference >= 0:
-                calculation = (2.5 * (difference)) + min((land.get_guardians()*land.get_gold())/land.get_guardians(), land.get_gold())
+                calculation = (2.5 * (difference)) + land.get_gold()
             else:
                 calculation = (2.5 * (0)) + min((adventurer_number*land.get_gold())/land.get_guardians(), land.get_gold())
                 if calculation < (2.5 * adventurer_number):
                     calculation = (2.5 * adventurer_number)
-            lst.append((calculation, land.get_name()))   
+            lst.append((calculation, land.get_name()))
         self.heap = MaxHeap.heapify(lst)
         
 if __name__ == "__main__":
@@ -114,7 +122,5 @@ if __name__ == "__main__":
     #print("__________________________")
     #nav.add_sites(sites2)
     lol = nav.simulate_day(100)
-    print(lol)
-    #nav.construct_score_data_structure(lol)
-    #nav.simulate_day(100)
-    #print(nav.sites)
+    #print(lol)
+    
